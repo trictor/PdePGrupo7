@@ -6,7 +6,7 @@ import Test.Hspec
 
 data Usuario= UnUsuario {
         nombre :: String,
-        billetera::Int
+        billetera::Float
       } deriving (Show, Eq)
 
 --EJEMPLOS--
@@ -23,7 +23,10 @@ extracción dineroAExtraer usuario =
 resultadoFinal dineroRestado | dineroRestado  > 0 = dineroRestado
                              | otherwise          = 0
 
---upgrade usuario = (billetera usuario) * 1.2 --revisar
+upgrade usuario = usuario{ billetera = upgradeBilletera (billetera usuario)}
+
+upgradeBilletera monto | monto * 0.2 < 10 = monto * 1.2
+                       | otherwise        = monto + 10
 
 cierreDeCuenta unUsuario = unUsuario {billetera = 0}
 
