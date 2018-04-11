@@ -48,17 +48,21 @@ data Usuario= UnUsuario {
 
 type Dinero = Float
 
+type Transaccion = Usuario -> Usuario
+
+type ValidacionUsuario = Usuario -> Bool
+
 --EJEMPLOS--
 pepe = UnUsuario "Jose" 10
 lucho = UnUsuario "Luciano" 2
 
 -- 1) EVENTOS
 
-deposito :: Dinero -> Usuario -> Usuario
+deposito :: Dinero -> Transaccion
 
 deposito dineroADepositar usuario = usuario{ billetera = dineroADepositar + (billetera usuario)}
 
-extracción :: Dinero -> Usuario -> Usuario
+extracción :: Dinero -> Transaccion
 
 extracción dineroAExtraer usuario =
         usuario{ billetera = (resultadoFinal ((billetera usuario) - dineroAExtraer)) }
@@ -68,7 +72,7 @@ resultadoFinal :: Dinero -> Dinero
 resultadoFinal dineroRestado | dineroRestado  > 0 = dineroRestado
                              | otherwise          = 0
 
-upgrade :: Usuario -> Usuario
+upgrade :: Transaccion
 
 upgrade usuario = usuario{ billetera = upgradeBilletera (billetera usuario)}
 
@@ -78,9 +82,40 @@ upgradeBilletera monto | monto * 0.2 < 10 = monto * 1.2
                        | otherwise        = monto + 10
 
 
-cierreDeCuenta :: Usuario -> Usuario
+cierreDeCuenta :: Transaccion
 
 cierreDeCuenta unUsuario = unUsuario {billetera = 0}
 
-quedaIgual :: Usuario -> Usuario
+quedaIgual :: Transaccion
 quedaIgual = id
+
+tocoYMeVoy :: Transaccion
+
+tocoYMeVoy  = cierreDeCuenta.upgrade.(deposito 15)
+
+ahorranteErrante :: Transaccion
+
+ahorranteErrante  = (deposito 10).upgrade.(deposito 8).(extracción 1).(deposito 2).(deposito 1)
+
+transaccion :: Int -> Transaccion
+
+transaccion numeroDeTransaccion usuario = (obtenerOperacion numeroDeTransaccion usuario) usuario
+
+obtenerOperacion :: Int -> Usuario -> Transaccion
+
+obtenerOperacion n usuario | n == 1 && esLucho usuario = cierreDeCuenta
+						   | n == 2 && esPepe usuario = deposito 5
+						   | n == 3 && esLucho usuario = tocoYMeVoy
+						   | n == 4 && esLucho usuario = ahorranteErrante
+						   | n == 5 && esPepe usuario = extracción 7
+						   | n == 5 && esLucho usuario = deposito 7
+ 						   | otherwise = quedaIgual
+
+esLucho :: ValidacionUsuario
+
+esLucho usuario = nombre usuario == "Luciano"
+
+esPepe :: ValidacionUsuario
+
+esPepe usuario =  nombre usuario == "Jose"
+
