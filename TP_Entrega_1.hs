@@ -24,7 +24,7 @@ testear = hspec $ do
 	test16
 	test17
 
-test1 = it "La billetera deberia quedar en 20, luego de depositar 10" ( ( billetera.(deposito 10) $ pepe )`shouldBe` 20)
+test1 = it "La billetera deberia quedar en 20, luego de depositar 10" $ ( billetera.deposito 10 ) pepe `shouldBe` 20 -- REVISAR PARENTESIS
 
 test2 = it "La billetera deberia quedar en 7, luego de extraer 3" ( ( billetera.(extracción 3) $ pepe )`shouldBe` 7)
 
@@ -83,7 +83,7 @@ lucho2 = UnUsuario "Luciano" 10
 
 deposito :: Dinero -> Transaccion
 
-deposito dineroADepositar usuario = usuario{ billetera = dineroADepositar + (billetera usuario)}
+deposito dineroADepositar usuario = usuario{ billetera = dineroADepositar + (billetera usuario)} -- ABSTRAER A NUEVA BILLETERA
 
 extracción :: Dinero -> Transaccion
 
@@ -114,17 +114,17 @@ quedaIgual = id
 
 tocoYMeVoy :: Transaccion
 
-tocoYMeVoy  = cierreDeCuenta.upgrade.(deposito 15)
+tocoYMeVoy  = cierreDeCuenta.upgrade.(deposito 15) -- REVISAR 
 
 ahorranteErrante :: Transaccion
 
-ahorranteErrante  = (deposito 10).upgrade.(deposito 8).(extracción 1).(deposito 2).(deposito 1)
+ahorranteErrante  = (deposito 10).upgrade.(deposito 8).(extracción 1).(deposito 2).(deposito 1) -- REVISAR 
 
 transaccion :: Int -> Transaccion
 
 transaccion numeroDeTransaccion usuario = (obtenerOperacion numeroDeTransaccion usuario) usuario
 
-obtenerOperacion :: Int -> Usuario -> Transaccion
+obtenerOperacion :: Int -> Usuario -> Transaccion     -- GENERALIZAR FUNCION DE VALUDACION Y FUNCION TRANSACCION GENERICA 
 
 obtenerOperacion n usuario 	| n == 1 && esLucho usuario = cierreDeCuenta
 														| n == 2 && esPepe usuario = deposito 5
